@@ -6,7 +6,7 @@ import(
 	"github.com/boltdb/bolt"
 )
 
-func GetUrl(shortUrl string) Status {
+func GetUrl(shortUrl string, DB_Handler *DBHandler) Status {
 	var statusResponse Status
 
 	err := DB_Handler.DB.View(func(tx *bolt.Tx) error {
@@ -50,7 +50,7 @@ func GetUrl(shortUrl string) Status {
 	return statusResponse
 }
 
-func SaveUrl(longUrl string) Status {
+func SaveUrl(longUrl string, DB_Handler *DBHandler) Status {
 	var shortUrl []byte
 	var statusResponse Status
 
@@ -155,15 +155,15 @@ func SaveUrl(longUrl string) Status {
 	return statusResponse
 }
 
-var DB_Handler DBHandler
-
-func Start() {
+func Start() *DBHandler {
+	var DB_Handler = &DBHandler{}
 	DB_Handler.RootBucketName = []byte("URL_Index")
 
 	err := DB_Handler.setupDB()
 	if err != nil {
 		panic(err)
 	}
+	return DB_Handler
 }
 
 func (dbh *DBHandler) setupDB() error {

@@ -7,8 +7,8 @@ import(
 
 func main() {
 	// boltdb service
-	models.Start()
+	DB_Handler := models.Start()
 
 	// api
-	web.Start()
+	web.Start(DB_Handler)
 }

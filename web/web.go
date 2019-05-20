@@ -13,16 +13,16 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func Start() {
+func Start(DB_Handler *models.DBHandler) {
 	log.Println("web starts")
 	router := mux.NewRouter()
 
 	router.HandleFunc("/", www.Index).Methods(http.MethodGet)
 
 	router.Handle("/api/shorturl/{url:[a-zA-Z0-9]{1,11}}", 
-		api.RedirectByShortURL()).Methods(http.MethodGet)
-	router.HandleFunc("/api/shorturl/new", 
-		api.NewShortURL).Methods(http.MethodPost)
+		api.RedirectByShortURL(DB_Handler)).Methods(http.MethodGet)
+	router.Handle("/api/shorturl/new", 
+		api.NewShortURL(DB_Handler)).Methods(http.MethodPost)
 
 	//serve the static files (CSS)
 	cssHandler := http.StripPrefix("/static", http.FileServer(http.Dir("./static")))
