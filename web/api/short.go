@@ -20,7 +20,7 @@ func RedirectByShortURL(DB_Handler *models.DBHandler) http.Handler {
 		vars := mux.Vars(r)
 		shortURL := vars["url"]
 
-		fmt.Println("\nshort url:",shortURL)
+		fmt.Println("\nRequested short url:",shortURL)
 
 		status := models.GetUrl(shortURL, DB_Handler)
 
@@ -42,7 +42,7 @@ func RedirectByShortURL(DB_Handler *models.DBHandler) http.Handler {
 					err)
 				return
 			}
-		fmt.Println("long url:",status.SuccessStatus.OriginalUrl)
+		fmt.Println("Corresponding long url:",status.SuccessStatus.OriginalUrl)
 		w.Write(jsonRes)
 		return
 	})
@@ -64,7 +64,6 @@ func NewShortURL(DB_Handler *models.DBHandler) http.Handler {
 				fmt.Println("Error while trying to marshal the JSON response:", err)
 				return
 			}
-			w.Header().Set("Content-Type", "application/json")
 			w.Write(jsonRes)
 			return
 		}*/
@@ -84,7 +83,7 @@ func NewShortURL(DB_Handler *models.DBHandler) http.Handler {
 		}
 		// At this point the long url was shortened successfully
 
-		// Respond to the client with appropiate JSON
+		// Respond to the client with the appropiate JSON
 		jsonRes, err := json.Marshal(status.SuccessStatus)
 		if err != nil {
 			fmt.Println("error while trying to marshal the JSON response:", err)
