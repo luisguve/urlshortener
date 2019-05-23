@@ -25,6 +25,10 @@ type Status struct {
 	FailureStatus 	*FailureResponse
 }
 
+type TestDB struct {
+    *DBHandler
+}
+
 // The range of values within the slice of base 62-encoded digits 
 // goes from 1 to 62.
 // But the ALPHABET array is 0-indexed. Its range goes from 0 to 61.

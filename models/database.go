@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/boltdb/bolt"
 )
@@ -155,32 +156,31 @@ func SaveUrl(longUrl string, DB_Handler *DBHandler) Status {
 }
 
 func Start() *DBHandler {
-	var DB_Handler = &DBHandler{}
-	DB_Handler.RootBucketName = []byte("URL_Index")
-
-	err := DB_Handler.setupDB()
+	var DB_Handler, err = Open("database/URL_Index.db", []byte("URL_Index"), 0600)
 	if err != nil {
+		fmt.Println("could not open database:", err.Error())
 		panic(err)
 	}
+
 	return DB_Handler
 }
 
-func (dbh *DBHandler) setupDB() error {
-	db, err := bolt.Open("database/URL_Index.db", 0600, nil)
+func Open(path string, rootBN []byte, mode os.FileMode) (*DBHandler, error) {
+	db, err := bolt.Open(path, mode, nil)
 	if err != nil {
-		return fmt.Errorf("could not open db, %v", err)
+		return nil, fmt.Errorf("could not open db, %v", err)
 	}
 	err = db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists(dbh.RootBucketName)
+		_, err := tx.CreateBucketIfNotExists(rootBN)
 		if err != nil {
 			return fmt.Errorf("could not create root bucket: %v", err)
 		}
 		return nil
 	})
 	if err != nil {
-		return fmt.Errorf("could not set up root bucket, %v", err)
+		return nil, fmt.Errorf("could not set up root bucket, %v", err)
 	}
-	dbh.DB = db
+
 	fmt.Println("DB Setup Done")
-	return nil
+	return &DBHandler{DB: db, RootBucketName: rootBN}, nil
 }
