@@ -55,10 +55,15 @@ func SaveUrl(longUrl string, DB_Handler *DBHandler) Status {
 	var shortUrl []byte
 	var statusResponse Status
 
+	if DB_Handler.DB == nil {
+		fmt.Println("DB_Handler.DB is nil!")
+		return Status{}
+	}
+	fmt.Printf("\nSaveUrl begins\n")
+
 	//check that the URL has not been shortened before
 	err := DB_Handler.DB.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket(DB_Handler.RootBucketName)
-
 		// Get the short URL with the given long URL as the key.
 		shortUrl = bucket.Get([]byte(longUrl))
 		// Get() may return nil, and that means that such key URL
@@ -75,7 +80,7 @@ func SaveUrl(longUrl string, DB_Handler *DBHandler) Status {
 	// So this will happen ONLY if the long URL has not been shortened yet.
 	if err == nil {
 		// Therefore we proceed to short the url and save it to the database.
-		err = DB_Handler.DB.Update(func(tx *bolt.Tx) error {
+		err := DB_Handler.DB.Update(func(tx *bolt.Tx) error {
 			bucket := tx.Bucket(DB_Handler.RootBucketName)
 
 			// Generate ID for the user.
@@ -151,7 +156,7 @@ func SaveUrl(longUrl string, DB_Handler *DBHandler) Status {
 			FailureStatus:		nil,
 		}
 	}
-
+	fmt.Printf("\nSaveUrl Ends\n\n")
 	return statusResponse
 }
 
